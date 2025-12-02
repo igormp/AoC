@@ -14,7 +14,7 @@ def check_invalid(j: int) -> int:
         if size % k != 0:
             continue
         piece = s[:k]
-        if piece * (size//k) == s:
+        if piece * (size // k) == s:
             # print(f"{j} all equal in {k} pieces")
             return j
     return 0
@@ -29,6 +29,19 @@ def iter_jobs(inputs):
             yield j
 
 
+def get_ranges(inputs):
+    for r in inputs:
+        start, end = r.split("-")
+        yield int(start), int(end)
+
+
+def sum_invalids(start, end):
+    total = 0
+    for j in range(start, end + 1):
+        total += check_invalid(j)
+    return total
+
+
 # FILE = "example.txt"
 
 if __name__ == "__main__":
@@ -36,12 +49,13 @@ if __name__ == "__main__":
 
     inputs = [(line.split(",")) for line in open(FILE)][0]
     inputs.sort(key=lambda x: int(x.split("-")[0]))
+    ranges = get_ranges(inputs)
 
     # Build all jobs (or you could stream with imap if memory is tight)
     jobs = list(iter_jobs(inputs))
 
     with Pool(cpu_count()) as pool:
-        results = pool.map(check_invalid, jobs, chunksize=1000)
+        results = pool.starmap(sum_invalids, ranges)
 
     invalid_sum = sum(results)
     print(invalid_sum)
