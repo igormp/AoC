@@ -2,17 +2,19 @@ from multiprocessing import Pool, cpu_count
 
 
 def check_invalid(j: int) -> int:
-    size = len(str(j))
+    s = str(j)
+    size = len(s)
     if size < 2:
         return 0
-    if all([i == str(j)[0] for i in list(str(j))]):
+    if all([i == s[0] for i in s[1:]]):
         # print(f"{j} all equal")
         return j
+
     for k in range(2, (size // 2) + 1):
         if size % k != 0:
             continue
-        pieces = [str(j)[i : i + k] for i in range(0, size, k)]
-        if all([i == pieces[0] for i in pieces]):
+        piece = s[:k]
+        if piece * (size//k) == s:
             # print(f"{j} all equal in {k} pieces")
             return j
     return 0
